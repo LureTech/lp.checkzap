@@ -21,11 +21,15 @@ export async function iniciarAssinatura(dados: Formulario): Promise<ResultadoChe
     const salvo = await salvarCliente({ nome: dados.nome, oficina: dados.oficina, email: dados.email, celular, cpfCnpj, referencia });
     const cliente = salvo.cliente;
 
-    // Já começou antes e não pagou: reaproveita a mesma cobrança em vez de abrir outra
+    // Já começou antes e não pagou: reaproveita a mesma cobrança em vez de abrir outra.
+    // Se já pagou alguma vez, é cliente: a cobrança em aberto é a do mês seguinte (o Asaas gera
+    // sozinho) e não pode ser oferecida aqui, senão a pessoa paga a próxima mensalidade adiantada.
     let assinatura = salvo.assinatura;
-    let cobranca = assinatura ? (await cobrancasDaAssinatura(assinatura.id)).find((c) => c.status === "PENDING" || c.status === "OVERDUE") : undefined;
-    if (assinatura && !cobranca) {
-      return { ok: false, erro: "Você já é cliente do CheckZap. Se precisar de ajuda, chame o suporte no WhatsApp." };
+    const cobrancas = assinatura ? await cobrancasDaAssinatura(assinatura.id) : [];
+    const jaPagou = cobrancas.some((c) => ["RECEIVED", "CONFIRMED", "RECEIVED_IN_CASH"].includes(c.status));
+    let cobranca = cobrancas.find((c) => c.status === "PENDING" || c.status === "OVERDUE");
+    if (assinatura && (jaPagou || !cobranca)) {
+      return { ok: false, erro: "Você já é cliente do CheckZap. Para entrar, use o acesso que chegou no seu e-mail ou chame o suporte no WhatsApp." };
     }
     if (assinatura && cobranca && cobranca.billingType !== "PIX") {
       await garantirPix(assinatura.id);
