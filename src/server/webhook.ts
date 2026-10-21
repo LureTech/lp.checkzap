@@ -19,7 +19,20 @@ const EVENTOS: Record<string, string> = {
 const json = (status: number, corpo: unknown) =>
   new Response(JSON.stringify(corpo), { status, headers: { "Content-Type": "application/json" } });
 
-export type EventoAsaas = { id?: string; event?: string; payment?: CobrancaAsaas; subscription?: { id: string; customer: string } };
+export type EventoAsaas = {
+  id?: string;
+  event?: string;
+  payment?: CobrancaAsaas;
+  subscription?: { id: string; customer: string; externalReference?: string | null };
+};
+
+// A conta do Asaas é compartilhada com outros produtos da Lure. Só repassa o que nasceu
+// no checkout desta página: a assinatura (e as cobranças dela) levam a referência "lp:<cpf/cnpj>".
+const REFERENCIA_LP = "lp:";
+function eDaLp(corpo: EventoAsaas): boolean {
+  const ref = corpo.payment?.externalReference ?? corpo.subscription?.externalReference ?? "";
+  return ref.startsWith(REFERENCIA_LP);
+}
 
 // Recebe o webhook do Asaas e repassa para a automação de implantação.
 // Se o repasse falhar, responde erro: o Asaas tenta de novo sozinho.
@@ -44,6 +57,7 @@ export async function receberWebhook(request: Request): Promise<Response> {
 export async function repassarEvento(corpo: EventoAsaas): Promise<{ status: number; corpo: Record<string, unknown> }> {
   const evento = EVENTOS[corpo.event ?? ""];
   if (!evento) return { status: 200, corpo: { ok: true, ignorado: corpo.event } };
+  if (!eDaLp(corpo)) return { status: 200, corpo: { ok: true, ignorado: "cobrança de outro produto" } };
 
   const clienteId = corpo.payment?.customer ?? corpo.subscription?.customer;
   if (!clienteId) return { status: 200, corpo: { ok: true, ignorado: "sem cliente" } };

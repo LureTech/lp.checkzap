@@ -22,5 +22,9 @@ function lerArquivo(): Record<string, string> {
 
 export function env(nome: string): string {
   const doAmbiente = (proc?.env?.[nome] ?? "").trim();
-  return doAmbiente || (lerArquivo()[nome] ?? "").trim();
+  const doArquivo = (lerArquivo()[nome] ?? "").trim();
+  // Em dev o .env manda: o valor que entrou no processo na primeira subida fica preso nele
+  // mesmo depois de o Vite reiniciar por mudança no .env. Em produção não há .env.
+  if (import.meta.env.DEV) return doArquivo || doAmbiente;
+  return doAmbiente || doArquivo;
 }
