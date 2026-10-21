@@ -10,4 +10,8 @@ export const CTA = {
 export const WHATSAPP_URL = "/#cta"; // A DEFINIR: https://wa.me/55DDDNUMERO
 
 // Domínio exibido nos links dos mockups (página do cliente, painel).
-export const DOMINIO = "checkzap.com.br"; // A DEFINIR
+export const DOMINIO = "checkzaap.com.br";
+
+// Login do sistema. www.checkzaap.com.br/entrar redireciona para cá (rota src/routes/entrar.ts),
+// e é esse o link que vai no e-mail e no WhatsApp de boas-vindas. Trocar quando o painel tiver domínio próprio.
+export const PAINEL_ENTRAR = "https://checkzap.169-58-59-237.sslip.io/entrar";

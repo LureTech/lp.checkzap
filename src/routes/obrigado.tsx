@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import { ArrowLeft, Check, Mail, MessageCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Mail, MessageCircle } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Confetti } from "@/components/Confetti";
 import { IconeWhatsApp } from "@/components/IconeWhatsApp";
@@ -97,7 +97,10 @@ function Obrigado() {
           <p className="mt-8 text-sm text-muted-foreground">
             Ainda não chegou? Às vezes o Pix leva alguns minutos para confirmar.
           </p>
-          <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+          <a href="/entrar" className="btn-primary btn-shimmer mt-6 w-full sm:w-auto !px-8 !py-3.5 !text-base">
+            Entrar no CheckZap <ArrowRight className="h-4 w-4" />
+          </a>
+          <div className="mt-4 flex flex-col sm:flex-row gap-3 justify-center">
             <a href={WHATSAPP_URL} className="btn-ghost">
               <MessageCircle className="h-4 w-4" /> Não chegou? Falar com o suporte
             </a>

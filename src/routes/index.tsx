@@ -49,8 +49,6 @@ function LandingPage() {
       <OrcamentoSugerido />
       <SectionDivider icon={Smartphone} label="Página do cliente" />
       <PaginaCliente />
-      <SectionDivider icon={Star} label="Quem já usa" />
-      <Depoimentos />
       <SectionDivider icon={Zap} label="Implantação automática" />
       <Implantacao />
       <SectionDivider icon={CircleCheck} label="Plano" />
@@ -64,15 +62,6 @@ function LandingPage() {
       <CheckoutModal />
     </div>
     </MotionConfig>
-  );
-}
-
-// Marca o que ainda precisa ser preenchido (preço, depoimento)
-function Preencher({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return (
-    <span className={`inline-flex items-center gap-1 rounded-md border border-dashed border-amber-500/70 bg-amber-50 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-amber-700 ${className}`}>
-      {children}
-    </span>
   );
 }
 
@@ -209,7 +198,8 @@ function Nav() {
             <a key={l.href} href={l.href} className="hover:text-foreground transition">{l.label}</a>
           ))}
         </nav>
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-4">
+          <a href="/entrar" className="text-sm text-muted-foreground hover:text-foreground transition">Entrar</a>
           <a href={CTA.href} className={`btn-primary btn-shimmer ${scrolled ? "!py-2 !px-4 !text-[0.85rem]" : ""}`}>{CTA.label}</a>
         </div>
         <button onClick={() => setOpen(!open)} className="md:hidden text-foreground p-2" aria-label={open ? "Fechar menu" : "Abrir menu"} aria-expanded={open}>
@@ -221,6 +211,7 @@ function Nav() {
           {NAV_LINKS.map((l) => (
             <a key={l.href} href={l.href} onClick={() => setOpen(false)}>{l.label}</a>
           ))}
+          <a href="/entrar" onClick={() => setOpen(false)}>Entrar</a>
           <a href={CTA.href} onClick={() => setOpen(false)} className="btn-primary text-center btn-shimmer">{CTA.label}</a>
         </div>
       )}
@@ -1612,74 +1603,6 @@ function PaginaCliente() {
   );
 }
 
-/* ---------------- DEPOIMENTOS (A PREENCHER) ---------------- */
-function Depoimentos() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(sectionRef, { once: true, margin: "-80px" });
-
-  // Espaços reservados: trocar pelos depoimentos reais das oficinas piloto
-  const items = Array.from({ length: 6 }, (_, i) => ({ n: "[Nome]", c: "[Oficina · cidade]", t: "[Depoimento de uma oficina piloto: o que mudou no dia a dia com o CheckZap.]", k: i }));
-  const loop = [...items, ...items];
-
-  return (
-    <section className="py-14 sm:py-20 md:py-32 overflow-hidden" ref={sectionRef}>
-      <style>{`
-        @keyframes depo-marquee {
-          from { transform: translateX(0); }
-          to { transform: translateX(-50%); }
-        }
-        .depo-track {
-          animation: depo-marquee 60s linear infinite;
-          will-change: transform;
-        }
-        .depo-mask {
-          -webkit-mask-image: linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%);
-                  mask-image: linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%);
-        }
-        @media (prefers-reduced-motion: reduce) { .depo-track { animation: none; } }
-      `}</style>
-
-      <div className="mx-auto max-w-7xl px-5 sm:px-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <SectionHeader
-          eyebrow="Quem já usa"
-          title={<>Donos de oficina falando de <span className="text-gradient-brand">resultado, não de sistema.</span></>}
-        />
-        <Preencher className="self-start md:self-auto">Depoimentos das oficinas piloto a preencher</Preencher>
-      </div>
-
-      <motion.div
-        className="mt-10 md:mt-14 depo-mask"
-        initial={{ opacity: 0 }}
-        animate={inView ? { opacity: 1 } : {}}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="depo-track flex gap-5 w-max">
-          {loop.map((i, idx) => (
-            <figure
-              key={idx}
-              className="w-[320px] sm:w-[380px] shrink-0 rounded-2xl bg-surface border-2 border-dashed border-border p-6 flex flex-col"
-            >
-              <div className="flex gap-0.5 mb-4">
-                {[...Array(5)].map((_, k) => (
-                  <Star key={k} className="h-4 w-4 text-border fill-border" />
-                ))}
-              </div>
-              <blockquote className="text-muted-foreground italic leading-relaxed flex-1 text-[15px]">{i.t}</blockquote>
-              <figcaption className="mt-6 flex items-center gap-3 pt-5 border-t border-border">
-                <div className="h-10 w-10 shrink-0 rounded-full bg-surface-2 border border-border" />
-                <div className="min-w-0">
-                  <div className="font-semibold text-sm truncate text-muted-foreground">{i.n}</div>
-                  <div className="text-xs text-muted-foreground truncate">{i.c}</div>
-                </div>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-      </motion.div>
-    </section>
-  );
-}
-
 /* ---------------- IMPLANTAÇÃO AUTOMÁTICA ---------------- */
 const FUNIL = [
   { t: "Seus dados e o Pix", d: "Direto aqui no site. O Pix confirma na hora." },
@@ -1862,7 +1785,6 @@ const INCLUSO = [
 function Planos() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
-  const emBreve = ["Nota fiscal", "Agenda de serviços", "Cupom de aniversário", "Estoque e financeiro"];
 
   return (
     <section id="planos" className="relative py-20 sm:py-24 md:py-32 overflow-hidden bg-white border-y border-border" ref={ref}>
@@ -1966,14 +1888,6 @@ function Planos() {
           </ul>
         </div>
 
-        <div className="mt-14 flex flex-wrap items-center justify-center gap-2 text-sm">
-          <span className="inline-flex items-center gap-1.5 font-bold uppercase tracking-wider text-xs text-brand-dark mr-1">
-            <Sparkles className="h-3.5 w-3.5" /> Em breve
-          </span>
-          {emBreve.map((e) => (
-            <span key={e} className="rounded-full border border-border bg-surface-2 px-3 py-1 text-muted-foreground">{e}</span>
-          ))}
-        </div>
       </div>
     </section>
   );

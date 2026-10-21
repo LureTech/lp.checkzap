@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EntrarRouteImport } from './routes/entrar'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as ApiAsaasWebhookRouteImport } from './routes/api/asaas/webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EntrarRoute = EntrarRouteImport.update({
+  id: '/entrar',
+  path: '/entrar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ObrigadoRoute = ObrigadoRouteImport.update({
@@ -31,30 +37,34 @@ const ApiAsaasWebhookRoute = ApiAsaasWebhookRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/entrar': typeof EntrarRoute
   '/obrigado': typeof ObrigadoRoute
   '/api/asaas/webhook': typeof ApiAsaasWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/entrar': typeof EntrarRoute
   '/obrigado': typeof ObrigadoRoute
   '/api/asaas/webhook': typeof ApiAsaasWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/entrar': typeof EntrarRoute
   '/obrigado': typeof ObrigadoRoute
   '/api/asaas/webhook': typeof ApiAsaasWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/obrigado' | '/api/asaas/webhook'
+  fullPaths: '/' | '/entrar' | '/obrigado' | '/api/asaas/webhook'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/obrigado' | '/api/asaas/webhook'
-  id: '__root__' | '/' | '/obrigado' | '/api/asaas/webhook'
+  to: '/' | '/entrar' | '/obrigado' | '/api/asaas/webhook'
+  id: '__root__' | '/' | '/entrar' | '/obrigado' | '/api/asaas/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  EntrarRoute: typeof EntrarRoute
   ObrigadoRoute: typeof ObrigadoRoute
   ApiAsaasWebhookRoute: typeof ApiAsaasWebhookRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/entrar': {
+      id: '/entrar'
+      path: '/entrar'
+      fullPath: '/entrar'
+      preLoaderRoute: typeof EntrarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/obrigado': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  EntrarRoute: EntrarRoute,
   ObrigadoRoute: ObrigadoRoute,
   ApiAsaasWebhookRoute: ApiAsaasWebhookRoute,
 }
