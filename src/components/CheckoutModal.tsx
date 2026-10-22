@@ -253,20 +253,6 @@ export function CheckoutModal() {
                   />
                 </div>
                 <CampoTexto rotulo="E-mail" valor={form.email} erro={erros.email} tipo="email" inputMode="email" autoComplete="email" onChange={(v) => mudar("email", v)} dica="Seu login e a senha chegam aqui." />
-                {/* robôs preenchem este campo; pessoas não veem */}
-                <input
-                  type="text"
-                  name="czx"
-                  data-1p-ignore
-                  data-lpignore="true"
-                  data-form-type="other"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  aria-hidden="true"
-                  className="absolute -left-[9999px] h-0 w-0 opacity-0"
-                  value={form.czx}
-                  onChange={(e) => setForm((f) => ({ ...f, czx: e.target.value }))}
-                />
               </div>
 
               <AnimatePresence>
@@ -297,6 +283,21 @@ export function CheckoutModal() {
               <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
                 <Lock className="h-3.5 w-3.5" /> Pagamento por Pix, processado pelo Asaas. O QR code aparece na próxima tela.
               </p>
+              {/* armadilha para robô: fora dos campos visíveis, nome sem sentido e display:none,
+                  que o preenchimento automático (e o de IA) do navegador pula por não ter foco */}
+              <input
+                type="text"
+                name="hp_k7q2"
+                data-1p-ignore
+                data-lpignore="true"
+                data-form-type="other"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="hidden"
+                value={form.czx}
+                onChange={(e) => setForm((f) => ({ ...f, czx: e.target.value }))}
+              />
             </motion.form>
             )}
             </AnimatePresence>
