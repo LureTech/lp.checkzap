@@ -6,7 +6,7 @@ import { Confetti } from "@/components/Confetti";
 import { consultarPix, iniciarCheckout, simularPix } from "@/lib/checkout";
 import { FormularioSchema, mascaraCelular, mascaraDocumento, type DadosPix, type Formulario } from "@/lib/formulario";
 
-type Campo = Exclude<keyof Formulario, "czx">;
+type Campo = Exclude<keyof Formulario, "czx" | "tempoMs">;
 const CAMPOS: Campo[] = ["nome", "oficina", "email", "whatsapp", "cpfCnpj"];
 const VAZIO: Record<Campo | "czx", string> = { nome: "", oficina: "", email: "", whatsapp: "", cpfCnpj: "", czx: "" };
 
@@ -20,7 +20,12 @@ export function CheckoutModal() {
   const [pix, setPix] = useState<{ dados: DadosPix; fatura: string } | null>(null);
   const [pago, setPago] = useState(false);
   const primeiroCampo = useRef<HTMLInputElement>(null);
+  const abertoEm = useRef(0);
   const etapa = pago ? 2 : pix ? 1 : 0;
+
+  useEffect(() => {
+    if (aberto) abertoEm.current = Date.now();
+  }, [aberto]);
 
   // Com o Pix na tela, confere de tempos em tempos se ele caiu
   useEffect(() => {
@@ -96,7 +101,7 @@ export function CheckoutModal() {
     }
     setEnviando(true);
     try {
-      const res = await iniciarCheckout({ data: r.data });
+      const res = await iniciarCheckout({ data: { ...r.data, tempoMs: Date.now() - abertoEm.current } });
       if (res.ok && res.pix) {
         setPix({ dados: res.pix, fatura: res.url });
         setEnviando(false);

@@ -7,9 +7,14 @@ import { celularBR, soDigitos, type Formulario, type ResultadoCheckout } from "@
 // Formulário enviado -> cliente no Asaas (lead) -> assinatura -> link da 1ª cobrança.
 export async function iniciarAssinatura(dados: Formulario): Promise<ResultadoCheckout> {
   console.log(`[checkout] pedido de ${dados.email.replace(/^(.).*@/, "$1***@")}`);
+  // Preenchimento automático/IA do navegador também mexe no campo armadilha. Só recusa
+  // se, além disso, o envio veio rápido demais para uma pessoa (ou sem o tempo, direto na API).
   if (dados.czx) {
-    console.warn("[checkout] campo armadilha preenchido, pedido recusado");
-    return { ok: false, erro: "Não foi possível continuar. Recarregue a página e tente de novo, ou chame a gente no WhatsApp." };
+    const rapido = (dados.tempoMs ?? 0) < 3000;
+    console.warn(`[checkout] campo armadilha preenchido, enviado em ${dados.tempoMs ?? "?"} ms${rapido ? ", pedido recusado" : ", segue"}`);
+    if (rapido) {
+      return { ok: false, erro: "Não foi possível continuar. Recarregue a página e tente de novo, ou chame a gente no WhatsApp." };
+    }
   }
   if (!env("ASAAS_API_KEY")) return { ok: false, erro: "Pagamento indisponível no momento. Chame a gente no WhatsApp." };
 

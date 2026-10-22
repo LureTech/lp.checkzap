@@ -44,6 +44,8 @@ export const FormularioSchema = z.object({
   // campo escondido (armadilha para robô). Só o servidor confere; o nome é
   // propositalmente sem sentido para o autopreenchimento do navegador não mexer nele.
   czx: z.string().max(200).optional(),
+  // milissegundos entre abrir o formulário e enviar (pessoa leva mais que robô)
+  tempoMs: z.number().int().nonnegative().optional(),
 });
 
 export type Formulario = z.infer<typeof FormularioSchema>;
